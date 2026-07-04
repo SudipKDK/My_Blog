@@ -1,0 +1,56 @@
+name: CI Pipeline
+on: 
+  push:
+    branches: 
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  frontend-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: run frontend test
+        working-directory: ./frontend
+        run: npm run test:run
+        
+      - name: build frontend
+        working-directory: ./frontend
+        run: npm run build
+        
+  backend-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: install dependencies
+        working-directory: ./backend
+        run: npm ci
+        
+      - name: run backend test
+        working-directory: ./backend
+        run: npm run test:cov -- --forceExit --ci
+        
+      - name: build backend
+        working-directory: ./backend
+        run: npm run build
+        
+        

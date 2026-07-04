@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devops-blog-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - BACKEND_URL=http://localhost:3000
+      - FRONTEND_URL=http://localhost:5173
+      # Provide your MongoDB Atlas connection string here or in the environment
+      - MONGODB_URI=${MONGODB_URI:-mongodb+srv://<username>:<password>@cluster0.mongodb.net/devops-blog?retryWrites=true&w=majority}
+      - JWT_SECRET=${JWT_SECRET:-change-me-to-a-random-256-bit-key}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-strongpassword}
+    volumes:
+      - backend_uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # In production, we'll route /api calls through a reverse proxy (or configure nginx)
+        # For local docker-compose testing without a reverse proxy, we might need a full URL if not routing through nginx
+        # However, it's best practice to use a relative URL and proxy it in Nginx.
+        # We will set Vite API URL here to point to localhost:3000 for local dev
+        VITE_API_URL: http://localhost:3000/api/v1
+    container_name: devops-blog-frontend
+    restart: always
+    ports:
+      - "5173:80"
+
+volumes:
+  backend_uploads:
