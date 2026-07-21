@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
+
 import { ValidationPipe, Logger } from '@nestjs/common';
 import helmet from 'helmet';
 
@@ -32,10 +32,9 @@ async function bootstrap() {
     transform: true,
   }));
 
-  // Serve static files from the 'uploads' folder
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
+
+  // Graceful shutdown
+  app.enableShutdownHooks();
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port, '0.0.0.0');

@@ -11,9 +11,12 @@ import { Categories, Tags, Archives, About, NotFound } from './components/Static
 // Admin Pages
 import { AdminLogin, AdminDashboard, CreatePost, EditPost } from './components/AdminPages';
 
+import { Toaster } from 'react-hot-toast';
+
 export default function App() {
   return (
     <AuthProvider>
+      <Toaster position="bottom-right" toastOptions={{ style: { background: '#18181b', color: '#fff', border: '1px solid #27272a' } }} />
       <BrowserRouter>
         <Routes>
           {/* Public Site */}

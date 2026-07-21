@@ -11,8 +11,7 @@ import { UploadModule } from './upload/upload.module';
 import { MongoExceptionFilter } from './common/filters/mongo-exception.filter';
 import { DuplicateKeyFilter } from './common/filters/duplicate-key.filter';
 import { UsersModule } from './users/users.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+
 
 @Module({
   imports: [
@@ -48,10 +47,7 @@ import { join } from 'path';
     AuthModule,
     UploadModule,
     UsersModule,
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
-      exclude: ['/api/{*splat}'],
-    }),
+
   ],
   controllers: [AppController],
   providers: [

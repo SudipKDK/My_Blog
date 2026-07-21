@@ -5,6 +5,7 @@ import {
   Eye, EyeOff, ChevronRight, ImagePlus, Loader2,
 } from 'lucide-react';
 import MDEditor from '@uiw/react-md-editor';
+import toast from 'react-hot-toast';
 import { postsApi, uploadApi, authApi } from '../api/posts';
 import { useAuth } from '../hooks/useAuth';
 import { readingTime } from './CodeBlock';
@@ -142,8 +143,9 @@ export const AdminDashboard = () => {
     try {
       await postsApi.remove(id);
       setPosts(prev => prev.filter(p => p._id !== id));
+      toast.success('Post deleted successfully');
     } catch {
-      alert('Failed to delete post. Please try again.');
+      toast.error('Failed to delete post. Please try again.');
     }
   };
 
@@ -296,7 +298,7 @@ const PostForm = ({ initialData, onSubmit, submitting }: PostFormProps) => {
       const url = await uploadApi.uploadImage(file);
       setCoverImage(url);
     } catch {
-      alert('Image upload failed. Please try again.');
+      toast.error('Image upload failed. Please try again.');
     }
   };
 
@@ -309,7 +311,7 @@ const PostForm = ({ initialData, onSubmit, submitting }: PostFormProps) => {
       const alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
       setContent(prev => `${prev}\n![${alt}](${url})\n`);
     } catch {
-      alert('Image upload failed. Please try again.');
+      toast.error('Image upload failed. Please try again.');
     } finally {
       setInsertingImage(false);
       if (contentImageRef.current) contentImageRef.current.value = '';
@@ -453,9 +455,10 @@ export const CreatePost = () => {
     setSubmitting(true);
     try {
       await postsApi.create(data);
+      toast.success('Post created!');
       navigate('/admin');
     } catch {
-      alert('Failed to create post. Please check your connection.');
+      toast.error('Failed to create post. Please check your connection.');
     } finally {
       setSubmitting(false);
     }
@@ -494,9 +497,10 @@ export const EditPost = () => {
     setSubmitting(true);
     try {
       await postsApi.update(id, data);
+      toast.success('Post updated!');
       navigate('/admin');
     } catch {
-      alert('Failed to update post.');
+      toast.error('Failed to update post.');
     } finally {
       setSubmitting(false);
     }

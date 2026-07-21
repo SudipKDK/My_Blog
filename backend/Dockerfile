@@ -23,12 +23,6 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy built backend artifacts from the builder stage
 COPY --from=builder /app/dist ./dist
 
-#  Tell Docker to copy from the new public folder!
-COPY public ./public
-
-# Create uploads directory (used for storing images)
-RUN mkdir -p uploads && chown -R node:node uploads
-
 # Expose port and define default command
 EXPOSE 3000
 USER node
