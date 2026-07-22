@@ -1,0 +1,85 @@
+# name: CD Pipeline
+
+
+# on:
+#   workflow_run:
+#     workflows: ["CI Pipeline"]
+#     types: [completed]
+
+# jobs:
+#   deploy-unified-app:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name:   Setup Nodejs
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20'
+
+#       - name: Install Frontend Dependencies
+#         working-directory: ./frontend
+#         run: npm ci
+
+#       - name: Build Frontend (Vite)
+#         working-directory: ./frontend
+#         run: npm run build
+#         env:
+#           VITE_API_URL: /api/v1
+          
+#       - name: Move Frontend assets to Backend Public Directry
+#         run: |
+#           mkdir -p backend/public
+#           cp -r frontend/dist/* backend/public/
+          
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: us-east-1 
+
+#       - name: Log in to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+
+#       - name: Build, tag, and push image to Amazon ECR
+#         id: build-image
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           ECR_REPOSITORY: my-nestjs-backend
+#           IMAGE_TAG: ${{ github.sha }}
+#         working-directory: ./backend
+#         run: |
+#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          
+#       - name: Fill in the new image ID in the Amazon ECS task definition
+#         id: task-def
+#         uses: aws-actions/amazon-ecs-render-task-definition@v1
+#         with:
+#           task-definition: backend/task-definition.json
+#           container-name: blog-backend
+#           image: ${{ steps.build-image.outputs.image }}
+#           environment-variables: |
+#             MONGODB_URI=${{ secrets.MONGODB_URI }}
+#             JWT_SECRET=${{ secrets.JWT_SECRET }}
+#             ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+#             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+#             BACKEND_URL=${{ secrets.BACKEND_URL }}
+#             FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+#             PORT=${{ secrets.PORT }}
+
+#       - name: Deploy Amazon ECS task definition
+#         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+#         with:
+#           task-definition: ${{ steps.task-def.outputs.task-definition }}
+#           service: blog-task-service-pjre3ej6
+#           cluster: blog-backend-cluster
+#           wait-for-service-stability: true
+            
+      
+          
