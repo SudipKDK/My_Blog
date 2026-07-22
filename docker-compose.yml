@@ -9,20 +9,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - PORT=3000
-      - BACKEND_URL=http://localhost:3000
-      - FRONTEND_URL=http://localhost:5173
-      # Provide your MongoDB Atlas connection string here or in the environment
-      - MONGODB_URI=${MONGODB_URI:-mongodb+srv://<username>:<password>@cluster0.mongodb.net/devops-blog?retryWrites=true&w=majority}
-      - JWT_SECRET=${JWT_SECRET:-change-me-to-a-random-256-bit-key}
-      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-strongpassword}
-      # AWS S3
-      - AWS_REGION=${AWS_REGION:-us-east-1}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+    env_file:
+      - ./backend/.env
 
   frontend:
     build:
