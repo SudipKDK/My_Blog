@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { ValidationPipe, Logger } from '@nestjs/common';
 import helmet from 'helmet';
+import { MulterExceptionFilter } from './common/filters/multer-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -32,7 +33,8 @@ async function bootstrap() {
     transform: true,
   }));
 
-
+  // Global exception filters (order matters: first registered = lowest priority)
+  app.useGlobalFilters(new MulterExceptionFilter());
   // Graceful shutdown
   app.enableShutdownHooks();
 

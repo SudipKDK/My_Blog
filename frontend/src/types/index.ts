@@ -24,3 +24,15 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
 }
+
+/**
+ * Standard error response shape from the NestJS backend.
+ * `message` can be a single string OR an array of validation error strings.
+ */
+export interface ApiErrorResponse {
+  statusCode: number;
+  message: string | string[];
+  error?: string;
+  timestamp?: string;
+  path?: string;
+}

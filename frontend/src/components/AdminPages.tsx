@@ -10,6 +10,7 @@ import { postsApi, uploadApi, authApi } from '../api/posts';
 import { useAuth } from '../hooks/useAuth';
 import { readingTime } from './CodeBlock';
 import type { Post, PostFormData } from '../types';
+import { extractErrorMessage, extractErrorWithStatus } from '../api/errors';
 
 // ─── Admin Login ──────────────────────────────────────────────────────────────
 
@@ -34,8 +35,8 @@ export const AdminLogin = () => {
       const { access_token } = await authApi.login(username, password);
       login(access_token);
       navigate('/admin');
-    } catch {
-      setError('Invalid credentials. Please try again.');
+    } catch (err) {
+      setError(extractErrorWithStatus(err, { 401: 'Invalid credentials. Please try again.' }));
     } finally {
       setLoading(false);
     }
@@ -144,8 +145,8 @@ export const AdminDashboard = () => {
       await postsApi.remove(id);
       setPosts(prev => prev.filter(p => p._id !== id));
       toast.success('Post deleted successfully');
-    } catch {
-      toast.error('Failed to delete post. Please try again.');
+    } catch (err) {
+      toast.error(extractErrorMessage(err, 'Failed to delete post. Please try again.'));
     }
   };
 
@@ -297,8 +298,8 @@ const PostForm = ({ initialData, onSubmit, submitting }: PostFormProps) => {
     try {
       const url = await uploadApi.uploadImage(file);
       setCoverImage(url);
-    } catch {
-      toast.error('Image upload failed. Please try again.');
+    } catch (err) {
+      toast.error(extractErrorMessage(err, 'Image upload failed. Please try again.'));
     }
   };
 
@@ -310,8 +311,8 @@ const PostForm = ({ initialData, onSubmit, submitting }: PostFormProps) => {
       const url = await uploadApi.uploadImage(file);
       const alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
       setContent(prev => `${prev}\n![${alt}](${url})\n`);
-    } catch {
-      toast.error('Image upload failed. Please try again.');
+    } catch (err) {
+      toast.error(extractErrorMessage(err, 'Image upload failed. Please try again.'));
     } finally {
       setInsertingImage(false);
       if (contentImageRef.current) contentImageRef.current.value = '';
@@ -457,8 +458,8 @@ export const CreatePost = () => {
       await postsApi.create(data);
       toast.success('Post created!');
       navigate('/admin');
-    } catch {
-      toast.error('Failed to create post. Please check your connection.');
+    } catch (err) {
+      toast.error(extractErrorMessage(err, 'Failed to create post. Please check your input.'));
     } finally {
       setSubmitting(false);
     }
@@ -499,8 +500,8 @@ export const EditPost = () => {
       await postsApi.update(id, data);
       toast.success('Post updated!');
       navigate('/admin');
-    } catch {
-      toast.error('Failed to update post.');
+    } catch (err) {
+      toast.error(extractErrorMessage(err, 'Failed to update post.'));
     } finally {
       setSubmitting(false);
     }

@@ -6,6 +6,7 @@ import { postsApi } from '../api/posts';
 import type { Post } from '../types';
 import { useSidebar, TableOfContents } from './Layout';
 import { MarkdownRenderer, readingTime } from './CodeBlock';
+import { extractErrorMessage } from '../api/errors';
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
@@ -58,7 +59,7 @@ export const Home = () => {
         setPosts(res.data);
         setTotalPages(Math.ceil(res.total / res.limit));
       })
-      .catch(() => setError('Failed to load posts. Is the backend running?'))
+      .catch((err) => setError(extractErrorMessage(err, 'Failed to load posts. Is the backend running?')))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
@@ -185,17 +186,17 @@ export const PostDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const articleRef = useRef<HTMLElement>(null);
   const { setRightSidebar } = useSidebar();
 
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
-    setError(false);
+    setError(null);
     postsApi.getBySlug(slug)
       .then(setPost)
-      .catch(() => setError(true))
+      .catch((err) => setError(extractErrorMessage(err, 'Post not found or could not be loaded.')))
       .finally(() => setLoading(false));
   }, [slug]);
 
@@ -219,7 +220,7 @@ export const PostDetail = () => {
   if (error || !post) return (
     <div className="py-40 text-center animate-fade-in">
       <p className="text-6xl font-black text-zinc-800 mb-4">404</p>
-      <p className="text-zinc-600 font-medium mb-8">Post not found or was removed.</p>
+      <p className="text-zinc-600 font-medium mb-8">{error || 'Post not found or was removed.'}</p>
       <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
         <ArrowLeft size={16} />Return Home
       </Link>
